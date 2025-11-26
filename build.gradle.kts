@@ -8,11 +8,14 @@ plugins {
     id("org.zaproxy.common")
 }
 
-description = "A template for a 3rd party ZAP Java add-on."
+description = (
+    "Includes request and response data in XML reports and provides the ability " +
+        "to upload reports directly to a Software Risk Manager server"
+)
 
 zapAddOn {
-    addOnId.set("addonjava")
-    addOnName.set("A Template Java Add-on")
+    addOnId.set("srm")
+    addOnName.set("Software Risk Manager Extension")
     zapVersion.set("2.16.0")
     addOnStatus.set(AddOnStatus.ALPHA)
 
@@ -20,9 +23,9 @@ zapAddOn {
     unreleasedLink.set("https://github.com/youruser/javaexample/compare/v@CURRENT_VERSION@...HEAD")
 
     manifest {
-        author.set("ZAP Dev Team")
-        url.set("https://www.zaproxy.org/docs/desktop/addons/addonjava/")
-        repo.set("https://github.com/zaproxy/addon-java")
+        author.set("Black Duck, Inc.")
+        url.set("https://www.zaproxy.org/docs/desktop/addons/software-risk-manager/")
+        repo.set("https://github.com/codedx/srm-zap-extension/")
         changesFile.set(tasks.named<ConvertMarkdownToHtml>("generateManifestChanges").flatMap { it.html })
 
         dependencies {
@@ -35,6 +38,15 @@ zapAddOn {
     }
 }
 
+dependencies {
+    compileOnly("org.zaproxy.addon:commonlib:1.36.0")
+    implementation("org.apache.httpcomponents:httpmime:4.5.13")
+    implementation("com.googlecode.json-simple:json-simple:1.1.1") {
+        // Not needed.
+        exclude(group = "junit")
+    }
+}
+
 java {
     val javaVersion = JavaVersion.VERSION_17
     sourceCompatibility = javaVersion
@@ -42,11 +54,8 @@ java {
 }
 
 spotless {
-    kotlinGradle {
-        ktlint()
+    java {
+        // Don't check license nor format/style, 3rd-party add-on.
+        clearSteps()
     }
-}
-
-dependencies {
-    compileOnly("org.zaproxy.addon:commonlib:1.36.0")
 }
